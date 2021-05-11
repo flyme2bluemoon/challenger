@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data: vscode-webview; style-src 'unsafe-inline' cspSource; script-src 'nonce-getNonce'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data: vscode-webview; style-src 'unsafe-inline' {{cspSource}}; script-src 'nonce-{{getNonce}}'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="bootstrapUri" rel="stylesheet">
-    <link href="styleResetUri" rel="stylesheet">
-    <link href="styleVSCodeUri" rel="stylesheet">
-    <link href="styleMainUri" rel="stylesheet">
+    <link href="{{bootstrapUri}}" rel="stylesheet">
+    <link href="{{styleResetUri}}" rel="stylesheet">
+    <link href="{{styleVSCodeUri}}" rel="stylesheet">
+    <link href="{{styleMainUri}}" rel="stylesheet">
 
     <title>Challenger Sidebar</title>
 </head>
@@ -45,6 +45,6 @@
         </button>
     </div>
 
-    <script nonce="getNonce" src="scriptUri" defer></script>
+    <script nonce="{{getNonce}}" src="{{scriptUri}}" defer></script>
 </body>
 </html>
