@@ -5,6 +5,7 @@
   "displayName": "challenger",
   "description": "VSCode Extension to help run and test command line programs for competitive programming competitions",
   "version": "0.1.0",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.56.0"
   },
