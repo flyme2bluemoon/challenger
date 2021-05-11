@@ -80,6 +80,7 @@ swiftc source.swift -o challenger_tmpfilename.tmp
 ```sh
 git clone https://github.com/flyme2bluemoon/challenger.git
 cd challenger
+npm install
 npm run compile # or npm run watch
 code .
 # F5 to run extention
