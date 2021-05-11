@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+import * as Mustache from "mustache";
 import { getNonce } from "./getNonce";
 
 export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
@@ -9,17 +10,20 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
     const styleVSCodeUri = path.join("vscode-resource:", extensionUri.fsPath, "media", "vscode.css");
     const styleMainUri = path.join("vscode-resource:", extensionUri.fsPath, "media", "main.css");
     const bootstrapUri = path.join("vscode-resource:", extensionUri.fsPath, "media", "bootstrap.min.css");
-
     const nonce = getNonce();
 
+    const view = {
+        bootstrapUri,
+        styleResetUri,
+        styleVSCodeUri,
+        styleMainUri,
+        scriptUri,
+        cspSource,
+        nonce
+    };
+
     let htmlSrc = fs.readFileSync(vscode.Uri.joinPath(extensionUri, "webviews", "index.html").fsPath, "utf8");
-    htmlSrc = htmlSrc.replaceAll("{{bootstrapUri}}", bootstrapUri);
-    htmlSrc = htmlSrc.replaceAll("{{styleResetUri}}", styleResetUri);
-    htmlSrc = htmlSrc.replaceAll("{{styleVSCodeUri}}", styleVSCodeUri);
-    htmlSrc = htmlSrc.replaceAll("{{styleMainUri}}", styleMainUri);
-    htmlSrc = htmlSrc.replaceAll("{{scriptUri}}", scriptUri);
-    htmlSrc = htmlSrc.replaceAll("{{cspSource}}", cspSource);
-    htmlSrc = htmlSrc.replaceAll("{{getNonce}}", nonce);
+    htmlSrc = Mustache.render(htmlSrc, view);
 
     if (typeof vscode.workspace.workspaceFolders !== "undefined") {
         const currentWorkingDirectory = vscode.workspace.workspaceFolders[0].uri;
