@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data: vscode-webview; style-src 'unsafe-inline' cspSource; script-src 'nonce-getNonce'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="bootstrapUri" rel="stylesheet">
+    <link href="styleResetUri" rel="stylesheet">
+    <link href="styleVSCodeUri" rel="stylesheet">
+    <link href="styleMainUri" rel="stylesheet">
+
+    <title>Challenger Sidebar</title>
+</head>
+<body>
+    <h1>Challenger</h1>
+
+    <hr>
+
+    <div id="codeSubmissionForm">
+        <label for="languages">Language</label>
+        <select name="languages" id="languages" class="form-select">
+            <option selected disabled>select</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="py">Python</option>
+            <option value="swift">Swift</option>
+        </select>
+        <br>
+        fileSelectElement
+        <br>
+        inputSelectElement
+        <br>
+        outputSelectElement
+        <br>
+        <button id="run-button">Run</button>
+    </div>
+
+    <br><hr><br>
+
+    <div id="reloader">
+        <button id="reload-button">
+            Reload files
+        </button>
+    </div>
+
+    <script nonce="getNonce" src="scriptUri" defer></script>
+</body>
+</html>
