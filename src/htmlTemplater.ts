@@ -12,18 +12,20 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
     const bootstrapUri = path.join("vscode-resource:", extensionUri.fsPath, "media", "bootstrap.min.css");
     const nonce = getNonce();
 
-    const view = {
+    let view = {
         bootstrapUri,
         styleResetUri,
         styleVSCodeUri,
         styleMainUri,
         scriptUri,
         cspSource,
-        nonce
+        nonce,
+        fileSelectElement: "",
+        inputSelectElement: "",
+        outputSelectElement: ""
     };
 
     let htmlSrc = fs.readFileSync(vscode.Uri.joinPath(extensionUri, "webviews", "index.html").fsPath, "utf8");
-    htmlSrc = Mustache.render(htmlSrc, view);
 
     if (typeof vscode.workspace.workspaceFolders !== "undefined") {
         const currentWorkingDirectory = vscode.workspace.workspaceFolders[0].uri;
@@ -47,7 +49,7 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
             fileSelectElement.push(`<option value="${file}">${file}</option>`);
         });
         fileSelectElement.push("</select>");
-        htmlSrc = htmlSrc.replaceAll("fileSelectElement", fileSelectElement.join(" "));
+        view.fileSelectElement = fileSelectElement.join(" ");
         if (inputDirectory) {
             const inputDirectoryUri = vscode.Uri.joinPath(currentWorkingDirectory, "input");
             const tmpInputFilesListing = await vscode.workspace.fs.readDirectory(inputDirectoryUri);
@@ -57,7 +59,7 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
                 inputSelectElement.push(`<option>input/${file}</option>`);
             });
             inputSelectElement.push("</select>");
-            htmlSrc = htmlSrc.replaceAll("inputSelectElement", inputSelectElement.join(" "));
+            view.inputSelectElement = inputSelectElement.join(" ");
         }
         if (outputDirectory) {
             const outputDirectoryUri = vscode.Uri.joinPath(currentWorkingDirectory, "output");
@@ -68,9 +70,11 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
                 outputSelectElement.push(`<option>output/${file}</option>`);
             });
             outputSelectElement.push("</select>");
-            htmlSrc = htmlSrc.replaceAll("outputSelectElement", outputSelectElement.join(" "));
+            view.outputSelectElement = outputSelectElement.join(" ");
         }
     }
+
+    htmlSrc = Mustache.render(htmlSrc, view);
 
     return htmlSrc;
 }
