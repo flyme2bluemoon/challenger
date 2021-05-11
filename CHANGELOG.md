@@ -10,6 +10,10 @@ All notable changes to the "challenger" extension will be documented in this fil
 - Settings file to select compilers when there are multiple available
 - Add support for a `.cpignore` file
 
+### Fixed
+- Removed `inputSelectElement` and `outputSelectElement` text when there is no input or output directories.
+- Reworked index html to make it the code more maintainable.
+
 ## [0.1.0] / 2021-05-10
 
 ### Added
