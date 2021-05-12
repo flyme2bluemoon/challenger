@@ -13,6 +13,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onCommand:runChallenger",
     "onView:challenger-sidebar"
   ],
   "main": "./out/extension.js",
@@ -37,7 +38,13 @@
         }
       ]
     },
-    "commands": []
+    "commands": [
+      {
+        "command": "runChallenger",
+        "title": "Run Challenger",
+        "category": "Challenger"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
