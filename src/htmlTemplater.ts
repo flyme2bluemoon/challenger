@@ -3,6 +3,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as Mustache from "mustache";
 import { getNonce } from "./getNonce";
+import { availableLanguages } from "./globals";
+import { getWorkspaceInfo } from "./fileManager";
 
 export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
     const scriptUri = path.join("vscode-resource:", extensionUri.fsPath, "media", "app.js");
@@ -20,6 +22,7 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
         scriptUri,
         cspSource,
         nonce,
+        languageSelectElement: "",
         fileSelectElement: "",
         inputSelectElement: "",
         outputSelectElement: ""
@@ -27,51 +30,41 @@ export async function getHtmlSrc(extensionUri: vscode.Uri, cspSource: string) {
 
     let htmlSrc = fs.readFileSync(vscode.Uri.joinPath(extensionUri, "webviews", "index.html").fsPath, "utf8");
 
-    if (typeof vscode.workspace.workspaceFolders !== "undefined") {
-        const currentWorkingDirectory = vscode.workspace.workspaceFolders[0].uri;
-        const directoryListing = await vscode.workspace.fs.readDirectory(currentWorkingDirectory);
-        let files: Array<string> = [];
-        let inputDirectory = false;
-        let outputDirectory = false;
-        directoryListing.forEach(file => {
-            if (file[1] == 2) {
-                if (file[0] == "input") {
-                    inputDirectory = true;
-                } else if (file[0] == "output") {
-                    outputDirectory = true;
-                }
-            } else {
-                files.push(file[0]);
-            }
+    let languageSelectElement = `<label for="languages">Language</label><select name="languages" id="languages" class="form-select"><option selected disabled>select</option>`;
+    availableLanguages.forEach(lang => {
+        languageSelectElement += `<option>${lang}</option>`;
+    });
+    languageSelectElement += `</select>`;
+    view.languageSelectElement = languageSelectElement;
+
+    const workspaceInfo = await getWorkspaceInfo();
+    if (workspaceInfo !== undefined) {
+        let fileSelectElement = "<label for='fileSelect'>Source Code</label> <select name='fileSelect' id='fileSelect' class='form-select'> <option selected disabled>select</option>";
+        workspaceInfo.cwdList.forEach((file: string) => {
+            fileSelectElement += `<option>${file}</option>`;
         });
-        let fileSelectElement: Array<string> = ["<label for='fileSelect'>Source Code</label>", "<select name='fileSelect' id='fileSelect' class='form-select'>", "<option selected disabled>select</option>"];
-        files.forEach(file => {
-            fileSelectElement.push(`<option value="${file}">${file}</option>`);
-        });
-        fileSelectElement.push("</select>");
-        view.fileSelectElement = fileSelectElement.join(" ");
-        if (inputDirectory) {
-            const inputDirectoryUri = vscode.Uri.joinPath(currentWorkingDirectory, "input");
-            const tmpInputFilesListing = await vscode.workspace.fs.readDirectory(inputDirectoryUri);
-            const inputFilesListing = tmpInputFilesListing.map(e => e[0]);
-            let inputSelectElement: Array<String> = ["<label for='inputSelect'>Input file</label>", "<select name='inputSelect' id='inputSelect' class='form-select'>", "<option selected>None</option>"];
-            inputFilesListing.forEach(file => {
-                inputSelectElement.push(`<option>input/${file}</option>`);
+        fileSelectElement += `</select>`;
+        view.fileSelectElement = fileSelectElement;
+
+        if (workspaceInfo.inputList !== undefined) {
+            let inputSelectElement = "<label for='inputSelect'>Input file</label> <select name='inputSelect' id='inputSelect' class='form-select'> <option selected>None</option>";
+            workspaceInfo.inputList.forEach((file: string) => {
+                inputSelectElement += `<option>${file}</option>`;
             });
-            inputSelectElement.push("</select>");
-            view.inputSelectElement = inputSelectElement.join(" ");
+            inputSelectElement += `</select>`;
+            view.inputSelectElement = inputSelectElement;
         }
-        if (outputDirectory) {
-            const outputDirectoryUri = vscode.Uri.joinPath(currentWorkingDirectory, "output");
-            const tmpOutputFilesListing = await vscode.workspace.fs.readDirectory(outputDirectoryUri);
-            const outputFilesListing = tmpOutputFilesListing.map(e => e[0]);
-            let outputSelectElement: Array<String> = ["<label for='outputSelect'>Output test</label>", "<select name='outputSelect' id='outputSelect' class='form-select'>", "<option selected>None</option>"];
-            outputFilesListing.forEach(file => {
-                outputSelectElement.push(`<option>output/${file}</option>`);
+
+        if (workspaceInfo.outputList !== undefined) {
+            let outputSelectElement = "<label for='outputSelect'>Output test</label> <select name='outputSelect' id='outputSelect' class='form-select'> <option selected>None</option>";
+            workspaceInfo.outputList.forEach((file: string) => {
+                outputSelectElement += `<option>${file}</option>`;
             });
-            outputSelectElement.push("</select>");
-            view.outputSelectElement = outputSelectElement.join(" ");
+            outputSelectElement += `</select>`;
+            view.outputSelectElement = outputSelectElement;
         }
+    } else {
+        vscode.window.showErrorMessage("This extension only works inside workspaces.");
     }
 
     htmlSrc = Mustache.render(htmlSrc, view);
