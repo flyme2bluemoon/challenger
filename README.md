@@ -4,7 +4,7 @@ VSCode Extension to help run and test command line programs for competitive prog
 
 ## Using the extension
 
-Open the extension webview in the VScode sidebar. You must select a language and the source code file. Optionally, you can select an input file and an output test. The input file will be passed to the standard input (stdin) of your program. The standard output will be compared to the output test file if one is selected. The input file must be in a directory called `input` and the output test must be in a directory called `output`.
+Open the extension webview in the VScode sidebar. You must select a language and the source code file. Optionally, you can select an input file and an output test. The input file will be passed to the standard input (stdin) of your program. The standard output will be compared to the output test file if one is selected. The input file must be in a directory called `input` and the output test must be in a directory called `output`. When looking for source code files, the extension will look through all files in the workspace's directory as well as subdirectories not named `input` or `output`. When looking for input and output files, the extension will look in any folder called `input` and `output` respectively but will not look into their subdirectories.
 
 #### Example directory layout
 
