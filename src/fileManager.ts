@@ -1,26 +1,53 @@
 import * as vscode from "vscode";
 
-async function listCurrentWorkingDirectory() {
-    // Since the undefined check is explicitly ignored, ensure that any callers have already checked whether or not vscode.workspace.workspaceFolders is defined.
-    // Notice how this function is not exported. That is on purpose. This function should only be called by getWorkspaceInfo which has checks in place.
-    // A similar message applies to the listInputDirectory and listOutputDirectory functions
-    const currentWorkingDirectory = vscode.workspace.workspaceFolders![0].uri;
-    const directoryListing = await vscode.workspace.fs.readDirectory(currentWorkingDirectory);
+async function listDirectoryContents(relativeDirectory: string) {
+    const workspaceFolder = vscode.workspace.workspaceFolders![0].uri;
+    const directoryPath = vscode.Uri.joinPath(workspaceFolder, relativeDirectory);
+    const directoryListing = await vscode.workspace.fs.readDirectory(directoryPath);
     return directoryListing;
 }
 
-async function listInputDirectory() {
-    const inputDirectoryUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, "input");
-    const directoryListing = await vscode.workspace.fs.readDirectory(inputDirectoryUri);
-    const res = directoryListing.map(e => "input/" + e[0]);
-    return res;
+function filterFiles(directoryListing: [string, vscode.FileType][], relativeDirectory: string = "") {
+    let list: Array<string> = [];
+    for (const file of directoryListing) {
+        if (file[1] == 1) {
+            list.push(relativeDirectory + (relativeDirectory ? "/" : "") + file[0]);
+        }
+    }
+    return list;
 }
 
-async function listOutputDirectory() {
-    const outputDirectoryUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, "output");
-    const directoryListing = await vscode.workspace.fs.readDirectory(outputDirectoryUri);
-    const res = directoryListing.map(e => "output/" + e[0]);
-    return res;
+async function listDirectory(relativeDirectory: string = "") {
+    const directoryListing = await listDirectoryContents(relativeDirectory);
+
+    let files: Array<string> = [];
+    let inputFiles: Array<string> = [];
+    let outputFiles: Array<string> = [];
+
+    for (const file of directoryListing) {
+        if (file[1] == 2) {
+            if (file[0] === "input") {
+                const subdirectoryListing = await listDirectoryContents(relativeDirectory + (relativeDirectory ? "/" : "") + "input");
+                inputFiles = inputFiles.concat(filterFiles(subdirectoryListing, relativeDirectory));
+            } else if (file[0] === "output") {
+                const subdirectoryListing = await listDirectoryContents(relativeDirectory + (relativeDirectory ? "/" : "") + "output");
+                outputFiles = outputFiles.concat(filterFiles(subdirectoryListing, relativeDirectory));
+            } else {
+                const subdirectoryListing = await listDirectory(file[0]);
+                files = files.concat(subdirectoryListing.files);
+                inputFiles = inputFiles.concat(subdirectoryListing.inputFiles);
+                outputFiles = outputFiles.concat(subdirectoryListing.outputFiles);
+            }
+        } else {
+            files.push(relativeDirectory + (relativeDirectory ? "/" : "") + file[0]);
+        }
+    }
+
+    return {
+        files,
+        inputFiles,
+        outputFiles
+    };
 }
 
 export async function getWorkspaceInfo() {
@@ -30,34 +57,11 @@ export async function getWorkspaceInfo() {
 
     let workspaceInfo: any = {};
 
-    let files: Array<string> = [];
-    let inputDirectory = false;
-    let outputDirectory = false;
+    const directoryListings = await listDirectory();
 
-    const directoryListing = await listCurrentWorkingDirectory();
-
-    directoryListing.forEach(file => {
-        if (file[1] == 2) {
-            if (file[0] == "input") {
-                inputDirectory = true;
-            } else if (file[0] == "output") {
-                outputDirectory = true;
-            }
-        } else {
-            files.push(file[0]);
-        }
-    });
-
-    workspaceInfo.cwdList = files;
-
-    if (inputDirectory) {
-        const inputFilesListing = await listInputDirectory();
-        workspaceInfo.inputList = inputFilesListing;
-    }
-    if (outputDirectory) {
-        const outputFilesListing = await listOutputDirectory();
-        workspaceInfo.outputList = outputFilesListing;
-    }
+    workspaceInfo.cwdList = directoryListings.files;
+    workspaceInfo.inputList = directoryListings.inputFiles;
+    workspaceInfo.outputList = directoryListings.outputFiles;
 
     return workspaceInfo;
 }
