@@ -6,13 +6,24 @@ All notable changes to the "challenger" extension will be documented in this fil
 
 ### Added
 - Support for Dart, Javascript, Typescript, Java, Rust
-- Access the extension through the Command Palette
 - Settings file to select compilers when there are multiple available
 - Add support for a `.cpignore` file
 
+## [0.2.0] / 2021=05-20
+
+### Added
+- Access the extension through the Command Palette
+    - Choose language, source file, input file and output test all from command palette
+    - Command palette quick run option to run the text file in focus
+- Added support for source code files inside subdirectories of workspace folder
+- Added support for multiple input and output directories
+- More bugs to be fixed later ;)
+
 ### Fixed
-- Removed `inputSelectElement` and `outputSelectElement` text when there is no input or output directories.
-- Reworked index html to make it the code more maintainable.
+- Improved sidebar webview stability
+- Removed `inputSelectElement` and `outputSelectElement` text when there is no input or output directories
+- Reworked index.html to make it the code more maintainable using mustache
+- Misc bug fixes
 
 ## [0.1.0] / 2021-05-10
 
