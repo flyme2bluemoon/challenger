@@ -9,7 +9,7 @@ All notable changes to the "challenger" extension will be documented in this fil
 - Settings file to select compilers when there are multiple available
 - Add support for a `.cpignore` file
 
-## [0.2.0] / 2021=05-20
+## [0.2.0] / 2021-05-21
 
 ### Added
 - Access the extension through the Command Palette
