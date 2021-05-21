@@ -4,7 +4,7 @@
   "repository": "github:flyme2bluemoon/challenger",
   "displayName": "challenger",
   "description": "VSCode Extension to help run and test command line programs for competitive programming competitions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.56.0"
@@ -14,6 +14,7 @@
   ],
   "activationEvents": [
     "onCommand:runChallenger",
+    "onCommand:quickRunChallenger",
     "onView:challenger-sidebar"
   ],
   "main": "./out/extension.js",
@@ -42,6 +43,11 @@
       {
         "command": "runChallenger",
         "title": "Run Challenger",
+        "category": "Challenger"
+      },
+      {
+        "command": "quickRunChallenger",
+        "title": "Challenger Quick Run",
         "category": "Challenger"
       }
     ]

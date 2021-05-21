@@ -1,11 +1,18 @@
 import * as vscode from "vscode";
 import { SidebarProvider } from "./SidebarProvider";
 import { CommandPaletteProvider } from "./CommandPaletteProvider";
+import { QuickRun } from "./QuickRun";
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("runChallenger", () => {
             CommandPaletteProvider();
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand("quickRunChallenger", () => {
+            QuickRun();
         })
     );
 
